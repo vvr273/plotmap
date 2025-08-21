@@ -153,3 +153,7 @@ input:checked + .slider:before { transform: translateX(26px); }
   width: 100%;
   transition: all 0.3s;
 }
+btn .clear {
+  background: #dc3545;
+  color: white;
+}

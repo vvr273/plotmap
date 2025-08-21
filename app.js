@@ -132,3 +132,16 @@ function showDistances() {
   output += `<b>Total Distance: ${total.toFixed(2)} km</b>`;
   infoDiv.innerHTML = output;
 }
+// Clear all inputs and markers
+function clearAll() {
+  document.getElementById("inputs").innerHTML = "";
+  markers.forEach(m => map.removeLayer(m));
+  markers = [];
+  places = [];
+  if (routeLine) {
+    map.removeLayer(routeLine);
+    routeLine = null;
+  }
+  document.getElementById("info").innerHTML = "";
+  addInput(); addInput();
+}
