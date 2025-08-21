@@ -1,0 +1,155 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #fafafa;
+}
+
+/* Title */
+.page-title {
+  text-align: center;
+  margin: 10px 0;
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Sidebar controls */
+.controls {
+  width: 320px;
+  min-width: 220px;
+  max-width: 400px;
+  box-sizing: border-box;
+  margin-right: 10px;
+  height: 100%;
+  padding: 15px;
+  background: #ffffff;
+  border-right: 1px solid #ddd;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.05);
+}
+
+.info {
+  padding: 10px;
+  margin-top: 15px;
+  background: #f8f8f8;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #444;
+}
+
+/* Input boxes */
+.place-input {
+  margin: 8px 0;
+  font-size: 14px;
+}
+.place-input input {
+  padding: 6px 8px;
+  margin: 3px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 120px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 8px 14px;
+  margin-top: 10px;
+  margin-right: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  transition: 0.2s;
+}
+.btn.add {
+  background: #28a745;
+  color: white;
+}
+.btn.add:hover { background: #218838; }
+.btn.draw {
+  background: #007bff;
+  color: white;
+}
+.btn.draw:hover { background: #0069d9; }
+
+/* Toggle switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+  margin: 0 10px;
+}
+.switch input { display: none; }
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px; width: 26px;
+  left: 4px; bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+input:checked + .slider { background-color: #2196F3; }
+input:checked + .slider:before { transform: translateX(26px); }
+
+/* Hamburger button */
+.hamburger {
+  position: fixed;
+  top: 30px;
+  left: 20px;
+  z-index: 9999;
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s;
+}
+.hamburger:hover { background: #f0f0f0; }
+.hamburger .bar {
+  width: 24px;
+  height: 3px;
+  background: #333;
+  margin: 3px 0;
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+
+/* Main layout */
+.main-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+  transition: all 0.3s;
+}
+.main-container.collapsed .controls { display: none; }
+.main-container.collapsed #map {
+  width: 100vw;
+  height: 90vh;
+  flex: 1 1 100%;
+}
+
+#map {
+  flex: 1;
+  height: 100vh;
+  width: 100%;
+  transition: all 0.3s;
+}

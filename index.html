@@ -1,119 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Route Mapping Demo</title>
-  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-    .controls {
-      width: 320px;
-      min-width: 220px;
-      max-width: 400px;
-      box-sizing: border-box;
-      margin-right: 10px;
-      height: 100%;
-    }
-    .controls { padding: 10px; background: #f0f0f0; }
-    .info { padding: 10px; background: #f8f8f8; border-top: 1px solid #ddd; }
-    .place-input { margin: 5px 0; }
-    button { padding: 5px 10px; margin-top: 5px; }
-
-    /* Toggle switch styling */
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 60px;
-      height: 34px;
-      margin-right: 10px;
-    }
-    .switch input { display: none; }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 34px;
-    }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 26px; width: 26px;
-      left: 4px; bottom: 4px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-    input:checked + .slider {
-      background-color: #2196F3;
-    }
-    input:checked + .slider:before {
-      transform: translateX(26px);
-    }
-
-    /* Collapsible inputs */
-    #collapsibleInputs {
-      display: none;
-      margin-top: 10px;
-    }
-
-    .hamburger {
-      position: fixed;
-      top: 30px;
-      left: 20px;
-      z-index: 9999;
-      width: 40px;
-      height: 40px;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      transition: background 0.2s;
-    }
-    .hamburger:hover {
-      background: #f0f0f0;
-    }
-    .hamburger .bar {
-      width: 24px;
-      height: 3px;
-      background: #333;
-      margin: 3px 0;
-      border-radius: 2px;
-      transition: all 0.3s;
-    }
-
-    /* When sidebar is collapsed, map fills the page */
-    .main-container {
-      display: flex;
-      flex-direction: row;
-      align-items: flex-start;
-      width: 100%;
-      transition: all 0.3s;
-    }
-    .main-container.collapsed .controls {
-      display: none;
-    }
-    .main-container.collapsed #map {
-      width: 100vw;
-      height: 90vh;
-      flex: 1 1 100%;
-    }
-    #map {
-      flex: 1;
-      height: 500px;
-      width: 100%;
-      transition: all 0.3s;
-    }
-  </style>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css" />
+  
 </head>
 <body>
 
@@ -124,7 +20,7 @@
   <div class="bar"></div>
 </div>
 
-<h2 style="text-align:center;">Route Mapping Demo</h2>
+<h2 class="page-title">Route Mapping Demo</h2>
 
 <div class="main-container" id="mainContainer">
   <div class="controls">
@@ -137,8 +33,8 @@
       <label>Place Names</label>
       <br><br>
       <div id="inputs"></div>
-      <button onclick="addInput()">Add Point</button>
-      <button onclick="drawRoute()">Draw Route</button>
+      <button class="btn add" onclick="addInput()">Add Point</button>
+      <button class="btn draw" onclick="drawRoute()">Draw Route</button>
     </div>
     <div class="info" id="info"></div>
   </div>
@@ -147,148 +43,7 @@
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-  // Initialize map
-  var map = L.map('map').setView([16.5062, 80.6480], 6);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
-
-  var places = [];
-  var markers = [];
-  var routeLine = null;
-  var inputType = "coords"; // default
-
-  // Collapsible logic
-  function toggleCollapse() {
-    const mainContainer = document.getElementById("mainContainer");
-    if (!mainContainer.classList.contains("collapsed")) {
-      mainContainer.classList.add("collapsed");
-    } else {
-      mainContainer.classList.remove("collapsed");
-      setTimeout(() => { map.invalidateSize(); }, 310);
-    }
-    // Always resize map after toggling
-    setTimeout(() => { map.invalidateSize(); }, 310);
-  }
-
-  // On page load, add 2 inputs and show collapsible
-  window.onload = () => {
-    document.getElementById("collapsibleInputs").style.display = "block";
-    addInput(); addInput();
-  };
-
-  function toggleInputType() {
-    let toggle = document.getElementById("toggleInput");
-    inputType = toggle.checked ? "places" : "coords";
-
-    // Clear inputs and add fresh fields
-    document.getElementById("inputs").innerHTML = "";
-    addInput(); addInput();
-  }
-
-  function addInput() {
-    let container = document.getElementById("inputs");
-    let div = document.createElement("div");
-    div.classList.add("place-input");
-
-    if (inputType === "coords") {
-      div.innerHTML = `Lat: <input type="text" class="lat"> Lng: <input type="text" class="lng">`;
-    } else {
-      div.innerHTML = `Place: <input type="text" class="place">`;
-    }
-    container.appendChild(div);
-  }
-
-  async function drawRoute() {
-    // Clear old markers & route
-    markers.forEach(m => map.removeLayer(m));
-    if (routeLine) map.removeLayer(routeLine);
-    markers = [];
-    places = [];
-
-    let inputs = document.querySelectorAll(".place-input");
-
-    for (let div of inputs) {
-      if (inputType === "coords") {
-        let lat = parseFloat(div.querySelector(".lat").value);
-        let lng = parseFloat(div.querySelector(".lng").value);
-        if (!isNaN(lat) && !isNaN(lng)) {
-          places.push({name: `(${lat},${lng})`, coords: [lat, lng]});
-        }
-      } else {
-        let name = div.querySelector(".place").value;
-        if (name.trim() !== "") {
-          let coords = await geocodePlace(name);
-          if (coords) {
-            places.push({name: name, coords: coords});
-          }
-        }
-      }
-    }
-
-    // Add markers & polyline
-    let latlngs = [];
-    places.forEach(p => {
-      let m = L.marker(p.coords).addTo(map).bindPopup(p.name);
-      markers.push(m);
-      latlngs.push(p.coords);
-    });
-
-    if (latlngs.length > 1) {
-      routeLine = L.polyline(latlngs, {color: 'blue'}).addTo(map);
-      map.fitBounds(routeLine.getBounds());
-    }
-
-    showDistances();
-  }
-
-  // Geocoding with Nominatim API
-  async function geocodePlace(name) {
-    let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(name)}`;
-    let res = await fetch(url);
-    let data = await res.json();
-    if (data.length > 0) {
-      return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-    }
-    return null;
-  }
-
-  // Haversine distance
-  function haversine(lat1, lon1, lat2, lon2) {
-    const R = 6371;
-    const toRad = x => x * Math.PI / 180;
-    let dLat = toRad(lat2 - lat1);
-    let dLon = toRad(lon2 - lon1);
-    let a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return (R * c).toFixed(2);
-  }
-
-  // Show distances
-  function showDistances() {
-    let infoDiv = document.getElementById("info");
-    if (places.length < 2) {
-      infoDiv.innerHTML = "Add at least 2 points.";
-      return;
-    }
-
-    let output = "<b>Distances:</b><br>";
-    let total = 0;
-    for (let i = 0; i < places.length-1; i++) {
-      let d = haversine(
-        places[i].coords[0], places[i].coords[1],
-        places[i+1].coords[0], places[i+1].coords[1]
-      );
-      total += parseFloat(d);
-      output += `${places[i].name} → ${places[i+1].name} = ${d} km<br>`;
-    }
-    output += `<b>Total Distance: ${total.toFixed(2)} km</b>`;
-    infoDiv.innerHTML = output;
-  }
-</script>
-
+<!-- App JS -->
+<script src="app.js"></script>
 </body>
 </html>
