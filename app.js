@@ -145,3 +145,6 @@ function clearAll() {
   document.getElementById("info").innerHTML = "";
   addInput(); addInput();
 }
+function printpage(){
+  window.print();
+}
