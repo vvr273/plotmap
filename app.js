@@ -148,30 +148,69 @@ function clearAll() {
 // function printpage(){
 //   window.print();
 // }
-function printpage() {
-  // Adjust map to fit all plotted lines/markers
-  if (map && bounds) {
-    map.fitBounds(bounds);
-  }
+// function printpage() {
+//   // Adjust map to fit all plotted lines/markers
+//   if (map && bounds) {
+//     map.fitBounds(bounds);
+//   }
 
-  // Check if device is mobile
-  const isMobile = window.innerWidth <= 768;
+//   // Check if device is mobile
+//   const isMobile = window.innerWidth <= 768;
 
-  if (isMobile) {
-    document.body.classList.add("print-mobile");
-  } else {
-    document.body.classList.add("print-desktop");
-  }
+//   if (isMobile) {
+//     document.body.classList.add("print-mobile");
+//   } else {
+//     document.body.classList.add("print-desktop");
+//   }
 
-  // Give some time for styles/zoom to apply
-  setTimeout(() => {
-    window.print();
-    document.body.classList.remove("print-mobile");
-    document.body.classList.remove("print-desktop");
-  }, 500);
-}
+//   // Give some time for styles/zoom to apply
+//   setTimeout(() => {
+//     window.print();
+//     document.body.classList.remove("print-mobile");
+//     document.body.classList.remove("print-desktop");
+//   }, 500);
+// }
 
 
+// function printpage() {
+//   let bounds = null;
+
+//   if (routeLine) {
+//     bounds = routeLine.getBounds();
+//   } else if (markers.length > 0) {
+//     bounds = L.latLngBounds(markers.map(m => m.getLatLng()));
+//   }
+
+//   if (bounds) {
+//     // Fit bounds with padding and extra zoom out
+//     map.fitBounds(bounds, {
+//       padding: [100, 100], // add space around edges
+//       duration: 1 ,
+//       maxZoom: map.getZoom() - 0.5// zoom out one level more
+//     });
+//   }
+
+//   const isMobile = window.innerWidth <= 768;
+
+//   if (isMobile) {
+//     document.body.classList.add("print-mobile");
+//   } else {
+//     document.body.classList.add("print-desktop");
+//   }
+//   map.once("moveend", () => {
+//     setTimeout(() => {
+//       window.print();
+//       document.body.classList.remove("print-mobile");
+//       document.body.classList.remove("print-desktop");
+//     }, 300); // small buffer
+//   });
+
+//   setTimeout(() => {
+//     window.print();
+//     document.body.classList.remove("print-mobile");
+//     document.body.classList.remove("print-desktop");
+//   }, 700); // little extra delay for rendering
+// }
 function printpage() {
   let bounds = null;
 
@@ -181,26 +220,39 @@ function printpage() {
     bounds = L.latLngBounds(markers.map(m => m.getLatLng()));
   }
 
-  if (bounds) {
-    // Fit bounds with padding and extra zoom out
-    map.fitBounds(bounds, {
-      padding: [100, 100], // add space around edges
-      duration: 1 ,
-      maxZoom: map.getZoom() - 0.5// zoom out one level more
-    });
-  }
-
+  const mainContainer = document.getElementById("mainContainer");
   const isMobile = window.innerWidth <= 768;
 
   if (isMobile) {
-    document.body.classList.add("print-mobile");
-  } else {
-    document.body.classList.add("print-desktop");
+    // Collapse sidebar temporarily
+    if (!mainContainer.classList.contains("collapsed")) {
+      mainContainer.classList.add("collapsed");
+      map.invalidateSize();
+    }
   }
 
-  setTimeout(() => {
-    window.print();
-    document.body.classList.remove("print-mobile");
-    document.body.classList.remove("print-desktop");
-  }, 700); // little extra delay for rendering
+  if (bounds) {
+    // Smoothly zoom out to fit everything
+    map.flyToBounds(bounds, {
+      padding: [120, 120],
+      duration: 1.5,
+      maxZoom: map.getZoom() - 0.5
+    });
+  }
+
+  // Add print class
+  document.body.classList.add(isMobile ? "print-mobile" : "print-desktop");
+
+  // Wait for map animation + layout
+  map.once("moveend", () => {
+    setTimeout(() => {
+      window.print();
+
+      // Restore classes after print
+      document.body.classList.remove("print-mobile", "print-desktop");
+
+      // Restore sidebar if mobile
+      if (isMobile) mainContainer.classList.remove("collapsed");
+    }, 500);
+  });
 }

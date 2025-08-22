@@ -158,22 +158,21 @@ btn .clear {
   color: white;
 }
 @media print {
-  body.print-desktop .sidebar {
+  body.print-desktop .controls {
     display: block; /* show sidebar on desktop */
   }
-  body.print-desktop .map {
-    width: 70%; /* adjust space for map */
+  body.print-desktop #map {
+    width: 70% !important;
   }
 
-  body.print-mobile .sidebar {
+  body.print-mobile .controls {
     display: none !important; /* hide sidebar on mobile */
   }
-  body.print-mobile .map {
+  body.print-mobile #map {
     width: 100% !important; /* full map */
   }
 
-  /* Ensure map fills page */
-  .map {
-    height: 100vh !important;
+  #map {
+    height: 100vh !important; /* map fills page */
   }
 }
