@@ -157,3 +157,23 @@ btn .clear {
   background: #dc3545;
   color: white;
 }
+@media print {
+  body.print-desktop .sidebar {
+    display: block; /* show sidebar on desktop */
+  }
+  body.print-desktop .map {
+    width: 70%; /* adjust space for map */
+  }
+
+  body.print-mobile .sidebar {
+    display: none !important; /* hide sidebar on mobile */
+  }
+  body.print-mobile .map {
+    width: 100% !important; /* full map */
+  }
+
+  /* Ensure map fills page */
+  .map {
+    height: 100vh !important;
+  }
+}

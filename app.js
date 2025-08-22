@@ -145,6 +145,62 @@ function clearAll() {
   document.getElementById("info").innerHTML = "";
   addInput(); addInput();
 }
-function printpage(){
-  window.print();
+// function printpage(){
+//   window.print();
+// }
+function printpage() {
+  // Adjust map to fit all plotted lines/markers
+  if (map && bounds) {
+    map.fitBounds(bounds);
+  }
+
+  // Check if device is mobile
+  const isMobile = window.innerWidth <= 768;
+
+  if (isMobile) {
+    document.body.classList.add("print-mobile");
+  } else {
+    document.body.classList.add("print-desktop");
+  }
+
+  // Give some time for styles/zoom to apply
+  setTimeout(() => {
+    window.print();
+    document.body.classList.remove("print-mobile");
+    document.body.classList.remove("print-desktop");
+  }, 500);
+}
+
+
+function printpage() {
+  let bounds = null;
+
+  if (routeLine) {
+    bounds = routeLine.getBounds();
+  } else if (markers.length > 0) {
+    bounds = L.latLngBounds(markers.map(m => m.getLatLng()));
+  }
+
+  if (bounds) {
+    // Fit bounds with padding and extra zoom out
+    map.fitBounds(bounds, {
+      padding: [100, 100], // add space around edges
+      duration: 1 ,
+      maxZoom: map.getZoom() - 0.5// zoom out one level more
+    });
+  }
+
+  const isMobile = window.innerWidth <= 768;
+
+  if (isMobile) {
+    document.body.classList.add("print-mobile");
+  } else {
+    document.body.classList.add("print-desktop");
+  }
+
+  setTimeout(() => {
+    window.print();
+    document.body.classList.remove("print-mobile");
+    document.body.classList.remove("print-desktop");
+  }, 700); // little extra delay for rendering
 }
